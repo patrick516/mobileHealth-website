@@ -4,7 +4,7 @@ A standalone marketing/informational website for **MobileHealth Malawi**, a
 digital health platform built for Community Health Workers (CHWs) and Health
 Surveillance Assistants (HSAs) in Malawi.
 
-> **Note:** This is a completely separate project from the MobileHealth
+> **Note:** This is the MobileHealth
 > Malawi mobile app and admin dashboard. It does **not** share a database,
 > backend, or codebase with the health platform itself. This website exists
 > purely to present the project publicly and capture contact/demo requests

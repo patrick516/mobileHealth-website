@@ -1,6 +1,6 @@
-import React from 'react';
-import { useAuth } from '../../context/AuthContext';
-import { Bell, User, Search } from 'lucide-react';
+import React from "react";
+import { useAuth } from "../../context/AuthContext";
+import { Bell, User, Search } from "lucide-react";
 
 export const Header: React.FC = () => {
   const { user } = useAuth();

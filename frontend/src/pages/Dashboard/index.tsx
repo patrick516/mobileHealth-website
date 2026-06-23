@@ -1,50 +1,84 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  Users, 
-  FileText, 
-  Mail, 
-  MailCheck,
+// src/pages/Dashboard/index.tsx
+import React, { useState, useEffect } from "react";
+import { analyticsApi } from "../../services/apiService";
+import {
+  Users,
+  FileText,
+  Mail,
+  Star,
   TrendingUp,
   TrendingDown,
+  Loader2,
   Eye,
-  Download,
-  ArrowRight,
-} from 'lucide-react';
-import { 
-  BarChart, 
-  Bar, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
+  MessageCircle,
+} from "lucide-react";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
   ResponsiveContainer,
-  LineChart,
-  Line,
-  PieChart,
-  Pie,
-  Cell,
-} from 'recharts';
-import api from '../../config/api';
+} from "recharts";
+import toast from "react-hot-toast";
 
-const COLORS = ['#0A6E3E', '#1A8A4E', '#F59E0B', '#1E40AF', '#EF4444'];
-
-interface Stats {
-  totalAdmins: number;
-  totalBlogs: number;
-  totalContacts: number;
-  totalNewsletter: number;
+interface DashboardStats {
+  totals: {
+    pageViews: number;
+    downloads: number;
+  };
+  today: {
+    pageViews: number;
+    downloads: number;
+  };
+  periods: {
+    week: number;
+    month: number;
+  };
+  topPages: { _id: string; count: number }[];
+  recentActivity: any[];
 }
 
+const StatCard: React.FC<{
+  label: string;
+  value: number;
+  icon: React.ReactNode;
+  color: string;
+  trend?: number;
+}> = ({ label, value, icon, color, trend }) => (
+  <div className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg transition-shadow">
+    <div className="flex items-center justify-between">
+      <div>
+        <p className="text-sm font-medium text-gray-500">{label}</p>
+        <p className="text-2xl font-bold text-gray-900">{value}</p>
+        {trend !== undefined && (
+          <div className="flex items-center gap-1 mt-1">
+            {trend > 0 ? (
+              <TrendingUp className="w-3 h-3 text-green-500" />
+            ) : (
+              <TrendingDown className="w-3 h-3 text-red-500" />
+            )}
+            <span
+              className={`text-xs ${
+                trend > 0 ? "text-green-500" : "text-red-500"
+              }`}
+            >
+              {trend > 0 ? "+" : ""}
+              {trend}% from last month
+            </span>
+          </div>
+        )}
+      </div>
+      <div className={`p-3 rounded-lg ${color}`}>{icon}</div>
+    </div>
+  </div>
+);
+
 export const Dashboard: React.FC = () => {
-  const [stats, setStats] = useState<Stats>({
-    totalAdmins: 0,
-    totalBlogs: 0,
-    totalContacts: 0,
-    totalNewsletter: 0,
-  });
+  const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
-  const [activityData, setActivityData] = useState<any[]>([]);
-  const [statusData, setStatusData] = useState<any[]>([]);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     fetchDashboardData();
@@ -52,163 +86,152 @@ export const Dashboard: React.FC = () => {
 
   const fetchDashboardData = async () => {
     try {
-      // In production, fetch from API
-      // const response = await api.get('/analytics/dashboard');
-      // setStats(response.data.data);
-      
-      // Demo data
-      setStats({
-        totalAdmins: 12,
-        totalBlogs: 45,
-        totalContacts: 128,
-        totalNewsletter: 356,
-      });
-      setActivityData([
-        { name: 'Mon', visits: 45, contacts: 12 },
-        { name: 'Tue', visits: 52, contacts: 8 },
-        { name: 'Wed', visits: 38, contacts: 15 },
-        { name: 'Thu', visits: 61, contacts: 10 },
-        { name: 'Fri', visits: 48, contacts: 18 },
-        { name: 'Sat', visits: 30, contacts: 6 },
-        { name: 'Sun', visits: 22, contacts: 4 },
-      ]);
-      setStatusData([
-        { name: 'Active', value: 8 },
-        { name: 'Inactive', value: 4 },
-      ]);
-    } catch (error) {
-      console.error('Error fetching dashboard data:', error);
+      const response = await analyticsApi.getStats();
+      console.log("Dashboard API response:", response);
+
+      if (response.data?.success) {
+        setStats(response.data.data);
+      } else {
+        setError(response.data?.message || "Failed to load dashboard data");
+      }
+    } catch (err: any) {
+      console.error("Dashboard error:", err);
+      setError(err.message || "Network error - check if backend is running");
     } finally {
       setLoading(false);
     }
   };
 
-  const statCards = [
-    { icon: Users, label: 'Admins', value: stats.totalAdmins, color: 'bg-primary/10 text-primary' },
-    { icon: FileText, label: 'Blog Posts', value: stats.totalBlogs, color: 'bg-secondary/10 text-secondary' },
-    { icon: Mail, label: 'Contacts', value: stats.totalContacts, color: 'bg-accent/10 text-accent' },
-    { icon: MailCheck, label: 'Subscribers', value: stats.totalNewsletter, color: 'bg-success/10 text-success' },
-  ];
-
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+        <Loader2 className="w-8 h-8 text-primary animate-spin" />
       </div>
     );
   }
 
-  return (
-    <div>
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-2xl font-bold text-text">Dashboard</h1>
-          <p className="text-text-secondary">Welcome back! Here's what's happening with your website.</p>
-        </div>
-        <button className="btn-primary flex items-center gap-2">
-          <Download size={18} />
-          Export Report
+  if (error) {
+    return (
+      <div className="card p-8 text-center">
+        <p className="text-red-600 mb-3">⚠️ {error}</p>
+        <p className="text-sm text-gray-500 mb-4">
+          Make sure your backend is running on port 5001
+        </p>
+        <button
+          onClick={fetchDashboardData}
+          className="btn-primary text-sm px-4 py-2"
+        >
+          Retry
         </button>
       </div>
+    );
+  }
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        {statCards.map((stat, index) => (
-          <div key={index} className="card">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-text-secondary">{stat.label}</p>
-                <p className="text-2xl font-bold text-text mt-1">{stat.value}</p>
-              </div>
-              <div className={`w-12 h-12 ${stat.color} rounded-lg flex items-center justify-center`}>
-                <stat.icon size={24} />
-              </div>
-            </div>
-            <div className="mt-3 flex items-center gap-1 text-sm">
-              <TrendingUp className="w-4 h-4 text-success" />
-              <span className="text-success">+12%</span>
-              <span className="text-text-light">from last month</span>
-            </div>
-          </div>
-        ))}
+  // Prepare chart data from topPages
+  const chartData =
+    stats?.topPages?.map((page, index) => ({
+      name: page._id || `Page ${index + 1}`,
+      views: page.count || 0,
+    })) || [];
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div>
+        <h1 className="text-2xl font-bold text-text">Dashboard</h1>
+        <p className="text-text-secondary">
+          Welcome back! Here's what's happening.
+        </p>
+      </div>
+
+      {/* Stats Cards with Primary colors */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <StatCard
+          label="Total Page Views"
+          value={stats?.totals?.pageViews || 0}
+          icon={<Eye className="w-5 h-5 text-white" />}
+          color="bg-primary"
+          trend={12}
+        />
+        <StatCard
+          label="Today's Views"
+          value={stats?.today?.pageViews || 0}
+          icon={<Users className="w-5 h-5 text-white" />}
+          color="bg-primary-dark"
+          trend={8}
+        />
+        <StatCard
+          label="Downloads"
+          value={stats?.totals?.downloads || 0}
+          icon={<FileText className="w-5 h-5 text-white" />}
+          color="bg-secondary"
+          trend={-3}
+        />
+        <StatCard
+          label="This Week"
+          value={stats?.periods?.week || 0}
+          icon={<TrendingUp className="w-5 h-5 text-white" />}
+          color="bg-primary-light"
+          trend={5}
+        />
       </div>
 
       {/* Charts */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-        <div className="lg:col-span-2 card">
-          <h3 className="text-lg font-semibold text-text mb-4">Activity Overview</h3>
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={activityData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" />
-              <YAxis />
-              <Tooltip />
-              <Bar dataKey="visits" fill="#0A6E3E" radius={[4, 4, 0, 0]} />
-              <Bar dataKey="contacts" fill="#F59E0B" radius={[4, 4, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="card">
+          <h3 className="text-lg font-semibold text-text mb-4">Top Pages</h3>
+          {chartData.length === 0 ? (
+            <div className="h-[280px] flex items-center justify-center text-gray-400">
+              No page data available
+            </div>
+          ) : (
+            <ResponsiveContainer width="100%" height={280}>
+              <BarChart
+                data={chartData.slice(0, 10)}
+                margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+              >
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip />
+                <Bar dataKey="views" fill="#0A6E3E" radius={[4, 4, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          )}
         </div>
 
         <div className="card">
-          <h3 className="text-lg font-semibold text-text mb-4">Admin Status</h3>
-          <ResponsiveContainer width="100%" height={300}>
-            <PieChart>
-              <Pie
-                data={statusData}
-                cx="50%"
-                cy="50%"
-                innerRadius={60}
-                outerRadius={100}
-                paddingAngle={5}
-                dataKey="value"
-              >
-                {statusData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                ))}
-              </Pie>
-              <Tooltip />
-            </PieChart>
-          </ResponsiveContainer>
-          <div className="flex justify-center gap-4 mt-2">
-            {statusData.map((item, index) => (
-              <div key={index} className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full" style={{ backgroundColor: COLORS[index] }} />
-                <span className="text-sm text-text-secondary">{item.name}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Recent Activity */}
-      <div className="card">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-text">Recent Activity</h3>
-          <button className="text-primary text-sm font-medium hover:underline flex items-center gap-1">
-            View All
-            <ArrowRight size={16} />
-          </button>
-        </div>
-        <div className="space-y-3">
-          {[
-            { user: 'John Doe', action: 'Published new blog post', time: '2 hours ago' },
-            { user: 'Mary Smith', action: 'Replied to contact message', time: '4 hours ago' },
-            { user: 'Peter Mwale', action: 'Added new admin user', time: '6 hours ago' },
-            { user: 'Sarah Phiri', action: 'Updated website settings', time: '1 day ago' },
-          ].map((item, index) => (
-            <div key={index} className="flex items-center justify-between py-3 border-b border-gray-100 last:border-0">
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
-                  <Users size={16} className="text-primary" />
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-text">{item.user}</p>
-                  <p className="text-sm text-text-secondary">{item.action}</p>
-                </div>
-              </div>
-              <span className="text-xs text-text-light">{item.time}</span>
+          <h3 className="text-lg font-semibold text-text mb-4">
+            Recent Activity
+          </h3>
+          {stats?.recentActivity?.length === 0 ? (
+            <div className="h-[280px] flex items-center justify-center text-gray-400">
+              No recent activity
             </div>
-          ))}
+          ) : (
+            <div className="space-y-3 max-h-[280px] overflow-y-auto">
+              {stats?.recentActivity
+                ?.slice(0, 10)
+                .map((activity: any, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center justify-between border-b border-gray-100 pb-2 last:border-0"
+                  >
+                    <div>
+                      <p className="text-sm font-medium text-text">
+                        {activity.page || "Unknown page"}
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        {new Date(activity.createdAt).toLocaleString()}
+                      </p>
+                    </div>
+                    <span className="text-xs text-gray-400">
+                      {activity.type}
+                    </span>
+                  </div>
+                ))}
+            </div>
+          )}
         </div>
       </div>
     </div>

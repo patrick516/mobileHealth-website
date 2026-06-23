@@ -13,10 +13,11 @@ import { useAuth } from "../../context/AuthContext";
 
 const navItems = [
   { path: "/", icon: LayoutDashboard, label: "Dashboard" },
-  { path: "/admins", icon: Users, label: "Admins" },
+
   { path: "/blog", icon: BookOpen, label: "Blog" },
   { path: "/contacts", icon: Mail, label: "Contacts" },
   { path: "/analytics", icon: BarChart, label: "Analytics" },
+  { path: "/admins", icon: Users, label: "Users" },
   { path: "/settings", icon: Settings, label: "Settings" },
 ];
 

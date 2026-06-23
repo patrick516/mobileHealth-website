@@ -1,11 +1,16 @@
-import React from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
-import { Toaster } from 'react-hot-toast';
-import { AuthProvider } from './context/AuthContext';
-import { ProtectedRoute } from './components/ProtectedRoute';
-import { AppLayout } from './components/Layout/AppLayout';
-import { Login } from './pages/Login';
-import { Dashboard } from './pages/Dashboard';
+import React from "react";
+import { Routes, Route, Navigate } from "react-router-dom";
+import { Toaster } from "react-hot-toast";
+import { AuthProvider } from "./context/AuthContext";
+import { ProtectedRoute } from "./components/ProtectedRoute";
+import { AppLayout } from "./components/Layout/AppLayout";
+import { Login } from "./pages/Login";
+import { Dashboard } from "./pages/Dashboard";
+import { Admins } from "./pages/Admins";
+import { Blog } from "./pages/Blog";
+import { Contacts } from "./pages/Contacts/index.tsx";
+import { Analytics } from "./pages/Analytics/index.tsx";
+import { Settings } from "./pages/Settings";
 
 function App() {
   return (
@@ -28,10 +33,7 @@ function App() {
           element={
             <ProtectedRoute>
               <AppLayout>
-                <div className="card">
-                  <h2 className="text-xl font-bold text-text">Admins Management</h2>
-                  <p className="text-text-secondary mt-2">Coming soon...</p>
-                </div>
+                <Admins />
               </AppLayout>
             </ProtectedRoute>
           }
@@ -41,10 +43,7 @@ function App() {
           element={
             <ProtectedRoute>
               <AppLayout>
-                <div className="card">
-                  <h2 className="text-xl font-bold text-text">Blog Management</h2>
-                  <p className="text-text-secondary mt-2">Coming soon...</p>
-                </div>
+                <Blog />
               </AppLayout>
             </ProtectedRoute>
           }
@@ -54,10 +53,7 @@ function App() {
           element={
             <ProtectedRoute>
               <AppLayout>
-                <div className="card">
-                  <h2 className="text-xl font-bold text-text">Contacts</h2>
-                  <p className="text-text-secondary mt-2">Coming soon...</p>
-                </div>
+                <Contacts />
               </AppLayout>
             </ProtectedRoute>
           }
@@ -67,10 +63,7 @@ function App() {
           element={
             <ProtectedRoute>
               <AppLayout>
-                <div className="card">
-                  <h2 className="text-xl font-bold text-text">Analytics</h2>
-                  <p className="text-text-secondary mt-2">Coming soon...</p>
-                </div>
+                <Analytics />
               </AppLayout>
             </ProtectedRoute>
           }
@@ -80,10 +73,7 @@ function App() {
           element={
             <ProtectedRoute>
               <AppLayout>
-                <div className="card">
-                  <h2 className="text-xl font-bold text-text">Settings</h2>
-                  <p className="text-text-secondary mt-2">Coming soon...</p>
-                </div>
+                <Settings />
               </AppLayout>
             </ProtectedRoute>
           }
