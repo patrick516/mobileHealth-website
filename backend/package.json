@@ -1,41 +1,34 @@
 {
-  "name": "backend",
+  "name": "mobilehealth-website-backend",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "MobileHealth Website Backend API",
+  "type": "module",
+  "main": "src/server.js",
   "scripts": {
-    "dev": "nodemon server.js",
-    "start": "node server.js",
-    "prisma:generate": "prisma generate",
-    "prisma:migrate": "prisma migrate dev",
-    "prisma:studio": "prisma studio",
-    "prisma:push": "prisma db push",
-    "prisma:reset": "prisma migrate reset",
-    "db:seed": "node prisma/seed.js"
+    "dev": "nodemon src/server.js",
+    "start": "node src/server.js",
+    "seed": "node src/seeders/index.js",
+    "seed:prod": "NODE_ENV=production node src/seeders/index.js"
   },
-  "keywords": [],
+  "keywords": ["mobilehealth", "api", "backend", "website"],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@prisma/client": "^5.22.0",
-    "axios": "^1.13.2",
-    "bcryptjs": "^3.0.3",
+    "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
-    "dotenv": "^17.2.3",
-    "ejs": "^3.1.10",
-    "express": "^5.2.1",
-    "express-rate-limit": "^8.2.1",
-    "express-validator": "^7.3.1",
-    "helmet": "^8.1.0",
-    "jsonwebtoken": "^9.0.3",
-    "morgan": "^1.10.1",
-    "multer": "^2.0.2",
-    "node-cron": "^4.2.1",
-    "nodemailer": "^7.0.11",
-    "twilio": "^5.10.7"
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "express-rate-limit": "^7.1.5",
+    "express-validator": "^7.0.1",
+    "helmet": "^7.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^7.5.0",
+    "morgan": "^1.10.0",
+    "multer": "^1.4.5-lts.1",
+    "node-cron": "^3.0.2",
+    "nodemailer": "^6.9.5"
   },
   "devDependencies": {
-    "nodemon": "^3.1.11",
-    "prisma": "^5.22.0"
+    "nodemon": "^3.0.1"
   }
 }
