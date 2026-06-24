@@ -10,7 +10,12 @@
     "seed": "node src/seeders/index.js",
     "seed:prod": "NODE_ENV=production node src/seeders/index.js"
   },
-  "keywords": ["mobilehealth", "api", "backend", "website"],
+  "keywords": [
+    "mobilehealth",
+    "api",
+    "backend",
+    "website"
+  ],
   "author": "",
   "license": "ISC",
   "dependencies": {
